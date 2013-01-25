@@ -1,0 +1,24 @@
+{
+  "name": "redis-shard",
+  "version": "0.0.1",
+  "description": "A consistent hashing library for redis in node",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "hash_ring": "0.2.1",
+    "redis": "0.8.2",
+    "step": "0.0.5"
+  },
+  "engines": {
+    "node": ">= 0.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/blindsey/redis-shard.git"
+  },
+  "author": "Ben Lindsey <ben.lindsey@gmail.com>",
+  "license": "MIT",
+  "readmeFilename": "README.md"
+}
