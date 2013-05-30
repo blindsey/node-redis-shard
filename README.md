@@ -6,7 +6,7 @@ A consistent sharding library for redis in node
     $ npm install redis-shard
 
     var RedisShard = require('redis-shard');
-    var options = { servers: [ '127.0.0.1:6379', '127.0.0.1:6479' ] };
+    var options = { servers: [ '127.0.0.1:6379', '127.0.0.1:6479' ], database : 1, password : 'redis4pulseLocker' };
     var redis = new RedisShard(options);
 
     // SINGLE
