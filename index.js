@@ -12,6 +12,12 @@ module.exports = function RedisShard(options) {
   options.servers.forEach(function(server) {
     var fields = server.split(/:/);
     var client = redis.createClient(parseInt(fields[1], 10), fields[0]);
+    if ( options.database ) {
+      client.select(options.database, function(){});
+    }
+    if ( options.password ) {
+      client.auth(options.password);
+    }
     clients[server] = client;
   });
 
