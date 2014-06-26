@@ -7,12 +7,12 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "hash_ring": "0.2.1",
-    "redis": "0.8.2",
+    "hashring": "2.0.1",
+    "redis": "0.10.3",
     "step": "0.0.5"
   },
   "engines": {
-    "node": ">= 0.6.0"
+    "node": ">= 0.10.15"
   },
   "repository": {
     "type": "git",
