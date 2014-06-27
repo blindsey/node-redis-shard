@@ -26,7 +26,7 @@ module.exports = function RedisShard(options) {
   for (var key in clients) {
     servers[key] = 1; // balanced ring for now
   }
-  var ring = new HashRing(servers);
+  self.ring = new HashRing(servers);
 
   // All of these commands have 'key' as their first parameter
   var SHARDABLE = [
@@ -42,7 +42,7 @@ module.exports = function RedisShard(options) {
   ];
   SHARDABLE.forEach(function(command) {
     self[command] = function() {
-      var node = ring.get(arguments[0]);
+      var node = self.ring.get(arguments[0]);
       var client = clients[node];
       client[command].apply(client, arguments);
     };
@@ -74,7 +74,7 @@ module.exports = function RedisShard(options) {
     // Setup chainable shardable commands
     SHARDABLE.forEach(function(command) {
       self[command] = function() {
-        var node = ring.get(arguments[0]);
+        var node = self.ring.get(arguments[0]);
         var multi = multis[node];
         if (!multi) {
           multi = multis[node] = clients[node].multi();
