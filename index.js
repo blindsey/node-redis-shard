@@ -1,5 +1,5 @@
 var assert = require('assert');
-var HashRing = require('hash_ring');
+var HashRing = require('hashring');
 var redis = require('redis');
 var step = require('step');
 
@@ -41,7 +41,7 @@ module.exports = function RedisShard(options) {
   ];
   SHARDABLE.forEach(function(command) {
     self[command] = function() {
-      var node = ring.getNode(arguments[0]);
+      var node = ring.get(arguments[0]);
       var client = clients[node];
       client[command].apply(client, arguments);
     };
@@ -73,7 +73,7 @@ module.exports = function RedisShard(options) {
     // Setup chainable shardable commands
     SHARDABLE.forEach(function(command) {
       self[command] = function() {
-        var node = ring.getNode(arguments[0]);
+        var node = ring.get(arguments[0]);
         var multi = multis[node];
         if (!multi) {
           multi = multis[node] = clients[node].multi();
