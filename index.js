@@ -11,7 +11,8 @@ module.exports = function RedisShard(options) {
   var clients = {};
   options.servers.forEach(function(server) {
     var fields = server.split(/:/);
-    var client = redis.createClient(parseInt(fields[1], 10), fields[0]);
+    var clientOptions = options.clientOptions || {};
+    var client = redis.createClient(parseInt(fields[1], 10), fields[0], clientOptions);
     if ( options.database ) {
       client.select(options.database, function(){});
     }
