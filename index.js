@@ -117,5 +117,27 @@ module.exports = function RedisShard(options) {
     return self; // Multi()
   };
 
+
+  self.on = function(event, listener) {
+    options.servers.forEach(function(server) {
+      clients[server].on(event, function() {
+        // append server as last arg passed to listener
+        var args = Array.prototype.slice.call(arguments).concat(server);
+        listener.apply(undefined, args);
+      });
+    });
+  };
+
+  // Note: listener will fire once per shard, not once per cluster
+  self.once = function(event, listener) {
+    options.servers.forEach(function(server) {
+      clients[server].once(event, function() {
+        // append server as last arg passed to listener
+        var args = Array.prototype.slice.call(arguments).concat(server);
+        listener.apply(undefined, args);
+      });
+    });
+  }
+
   return self; // RedisShard()
 };
