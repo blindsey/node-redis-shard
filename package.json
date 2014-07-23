@@ -1,6 +1,6 @@
 {
   "name": "redis-shard",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A consistent hashing library for redis in node",
   "main": "index.js",
   "scripts": {
@@ -19,6 +19,9 @@
     "url": "git://github.com/blindsey/node-redis-shard.git"
   },
   "author": "Ben Lindsey <ben.lindsey@gmail.com>",
+  "contributors": [
+    "Toby Fox <tobyfox@gmail.com>"
+  ],
   "license": "MIT",
   "readmeFilename": "README.md"
 }
