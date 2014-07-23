@@ -11,7 +11,8 @@ module.exports = function RedisShard(options) {
   var clients = {};
   options.servers.forEach(function(server) {
     var fields = server.split(/:/);
-    var client = redis.createClient(parseInt(fields[1], 10), fields[0]);
+    var clientOptions = options.clientOptions || {};
+    var client = redis.createClient(parseInt(fields[1], 10), fields[0], clientOptions);
     if ( options.database ) {
       client.select(options.database, function(){});
     }
@@ -25,7 +26,7 @@ module.exports = function RedisShard(options) {
   for (var key in clients) {
     servers[key] = 1; // balanced ring for now
   }
-  var ring = new HashRing(servers);
+  self.ring = new HashRing(servers);
 
   // All of these commands have 'key' as their first parameter
   var SHARDABLE = [
@@ -41,7 +42,7 @@ module.exports = function RedisShard(options) {
   ];
   SHARDABLE.forEach(function(command) {
     self[command] = function() {
-      var node = ring.get(arguments[0]);
+      var node = self.ring.get(arguments[0]);
       var client = clients[node];
       client[command].apply(client, arguments);
     };
@@ -73,7 +74,7 @@ module.exports = function RedisShard(options) {
     // Setup chainable shardable commands
     SHARDABLE.forEach(function(command) {
       self[command] = function() {
-        var node = ring.get(arguments[0]);
+        var node = self.ring.get(arguments[0]);
         var multi = multis[node];
         if (!multi) {
           multi = multis[node] = clients[node].multi();
@@ -115,6 +116,28 @@ module.exports = function RedisShard(options) {
     };
     return self; // Multi()
   };
+
+
+  self.on = function(event, listener) {
+    options.servers.forEach(function(server) {
+      clients[server].on(event, function() {
+        // append server as last arg passed to listener
+        var args = Array.prototype.slice.call(arguments).concat(server);
+        listener.apply(undefined, args);
+      });
+    });
+  };
+
+  // Note: listener will fire once per shard, not once per cluster
+  self.once = function(event, listener) {
+    options.servers.forEach(function(server) {
+      clients[server].once(event, function() {
+        // append server as last arg passed to listener
+        var args = Array.prototype.slice.call(arguments).concat(server);
+        listener.apply(undefined, args);
+      });
+    });
+  }
 
   return self; // RedisShard()
 };
