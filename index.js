@@ -67,7 +67,6 @@ module.exports = function RedisShard(options) {
   // This is the tricky part - pipeline commands to multiple servers
   self.multi = function Multi() {
 
-    var self = {};
     var multis = {};
     var interlachen = [];
 
