@@ -1,6 +1,6 @@
 {
   "name": "redis-shard",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "A consistent hashing library for redis in node",
   "main": "index.js",
   "scripts": {
