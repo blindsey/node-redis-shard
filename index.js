@@ -53,7 +53,7 @@ module.exports = function RedisShard(options) {
     "auth", "bgrewriteaof", "bgsave", "bitop", "brpoplpush", "client kill", "client list", "client getname",
     "client setname", "config get", "config set", "config resetstat", "dbsize", "debug segfault", "discard",
     "echo", "eval", "evalsha", "exec", "flushall", "flushdb", "info", "keys", "lastsave", "migrate", "monitor",
-    "mset", "msetnx", "multi", "object", "ping", "psubscribe", "publish", "punsubscribe", "quit", "randomkey",
+    "mset", "msetnx", "object", "ping", "psubscribe", "publish", "punsubscribe", "quit", "randomkey",
     "rpoplpush", "save", "script exists", "script flush", "script kill", "script load", "sdiffstore", "select",
     "shutdown", "sinterstore", "slaveof", "slowlog", "smove", "subscribe", "sunionstore", "sync", "time",
     "unsubscribe", "unwatch", "zinterstore", "zunionstore"
