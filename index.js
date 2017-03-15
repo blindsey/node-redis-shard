@@ -7,7 +7,7 @@ module.exports = function RedisShard(options) {
   assert(!!options, "options must be an object");
   assert(Array.isArray(options.servers), "servers must be an array");
 
-  var self = {};
+  var _self = {};
   var clients = {};
   options.servers.forEach(function(server) {
     var fields = server.split(/:/);
@@ -26,7 +26,7 @@ module.exports = function RedisShard(options) {
   for (var key in clients) {
     servers[key] = 1; // balanced ring for now
   }
-  self.ring = new HashRing(servers);
+  _self.ring = new HashRing(servers);
 
   // All of these commands have 'key' as their first parameter
   var SHARDABLE = [
@@ -41,8 +41,8 @@ module.exports = function RedisShard(options) {
     "zrevrangebyscore", "zrevrank", "zscore"
   ];
   SHARDABLE.forEach(function(command) {
-    self[command] = function() {
-      var node = self.ring.get(arguments[0]);
+    _self[command] = function() {
+      var node = _self.ring.get(arguments[0]);
       var client = clients[node];
       client[command].apply(client, arguments);
     };
@@ -59,40 +59,40 @@ module.exports = function RedisShard(options) {
     "unsubscribe", "unwatch", "zinterstore", "zunionstore"
   ];
   UNSHARDABLE.forEach(function(command) {
-    self[command] = function() {
+    _self[command] = function() {
       throw new Error(command + ' is not shardable');
     };
   });
 
   // This is the tricky part - pipeline commands to multiple servers
-  self.multi = function Multi() {
+  _self.multi = function Multi() {
 
-    var self = {};
+    var multiSelf = {};
     var multis = {};
     var interlachen = [];
 
     // Setup chainable shardable commands
     SHARDABLE.forEach(function(command) {
-      self[command] = function() {
-        var node = self.ring.get(arguments[0]);
+      multiSelf[command] = function() {
+        var node = _self.ring.get(arguments[0]);
         var multi = multis[node];
         if (!multi) {
           multi = multis[node] = clients[node].multi();
         }
         interlachen.push(node);
         multi[command].apply(multi, arguments);
-        return self;
+        return multiSelf;
       };
     });
 
     UNSHARDABLE.forEach(function(command) {
-      self[command] = function() {
+      multiSelf[command] = function() {
         throw new Error(command + " is not supported");
       };
     });
 
     // Exec the pipeline and interleave the results
-    self.exec = function(callback) {
+    multiSelf.exec = function(callback) {
       var nodes = Object.keys(multis);
       step(
         function run() {
@@ -114,11 +114,11 @@ module.exports = function RedisShard(options) {
         }
       );
     };
-    return self; // Multi()
+    return multiSelf; // Multi()
   };
 
 
-  self.on = function(event, listener) {
+  _self.on = function(event, listener) {
     options.servers.forEach(function(server) {
       clients[server].on(event, function() {
         // append server as last arg passed to listener
@@ -129,7 +129,7 @@ module.exports = function RedisShard(options) {
   };
 
   // Note: listener will fire once per shard, not once per cluster
-  self.once = function(event, listener) {
+  _self.once = function(event, listener) {
     options.servers.forEach(function(server) {
       clients[server].once(event, function() {
         // append server as last arg passed to listener
@@ -139,5 +139,5 @@ module.exports = function RedisShard(options) {
     });
   }
 
-  return self; // RedisShard()
+  return _self; // RedisShard()
 };
