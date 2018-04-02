@@ -2,6 +2,8 @@ const assert = require('assert');
 const HashRing = require('hashring');
 const redis = require('redis');
 const step = require('step');
+const _ = require('lodash');
+const async = require('async');
 
 module.exports = function RedisShard(options) {
   assert(!!options, 'options must be an object');
@@ -47,6 +49,37 @@ module.exports = function RedisShard(options) {
       client[command](...arguments);
     };
   });
+
+  // mget
+  self.mget = function () {
+    const keys = _.first(arguments);
+    const callback = _.last(arguments);
+    const mapping = _.reduce(keys, (acc, key) => {
+      const node = self.ring.get(key);
+      if (_.has(acc, node)) {
+        acc[node].push(key);
+      } else {
+        acc[node] = [key];
+      }
+      return acc;
+    }, {});
+    const nodes = _.keys(mapping);
+    async.map(nodes, (node, next) => {
+      const keys = mapping[node];
+      const client = clients[node];
+      client.mget(keys, next);
+    }, (err, results) => {
+      if (err) {
+        return callback(err);
+      }
+      const keyHash = _.reduce(nodes, (acc, node, index) => {
+        const keys = mapping[node];
+        const values = _.get(results, [index], []);
+        return _.assign(acc, _.zipObject(keys, values));
+      }, {});
+      return callback(err, _.map(keys, key => keyHash[key]));
+    });
+  };
 
   // No key parameter to shard on - throw Error
   const UNSHARDABLE = [
