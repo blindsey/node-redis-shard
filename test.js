@@ -15,17 +15,21 @@ async.times(NUM, (index, next) => {
     servers: _.map(_.times(NUM, n => `127.0.0.1:${PORT + n}`))
   };
   const redis = new RedisShard(options);
-  const KEY_NUM = 20;
+  const KEY_NUM = 1000;
 
-  async.times(KEY_NUM, (n, next) => redis.set(`foo${n}`, `bar${n}`, next), (err) => {
-    const keys = _.times(KEY_NUM, n => `foo${n}`);
-    redis.mget(keys, (err, values) => {
-      //      console.log(keys, values);
-      if (err || keys.length != values.length) {
-        return console.log('Error is', err || 'length mismatch');
-      }
-      console.log('Tests successful');
-    });
+  const keys = _.times(KEY_NUM, n => `foo${n}`);
+  const values = _.times(KEY_NUM, n => `bar${n}`);
+  const msetArgs = _
+    .chain(keys)
+    .zip(values)
+    .flatten()
+    .value();
+
+  async.auto({
+    mset: callback => redis.mset(msetArgs, callback),
+    mget: ['mset', callback => redis.mget(keys, callback)]
+  }, (err, { mset, mget }) => {
+    console.log('error is', err, mset);
   });
 });
 

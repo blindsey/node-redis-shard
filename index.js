@@ -67,6 +67,7 @@ module.exports = function RedisShard(options) {
     async.map(nodes, (node, next) => {
       const keys = mapping[node];
       const client = clients[node];
+      console.log(node, keys.length);
       client.mget(keys, next);
     }, (err, results) => {
       if (err) {
@@ -81,12 +82,39 @@ module.exports = function RedisShard(options) {
     });
   };
 
+  // mset
+  self.mset = function () {
+    const keys = _.first(arguments);
+    const callback = _.last(arguments);
+    const mapping = _.reduce(keys, (acc, key, index) => {
+      const keyCheck = index % 2 ? keys[index - 1] : key;
+      const node = self.ring.get(keyCheck);
+      if (_.has(acc, node)) {
+        acc[node].push(key);
+      } else {
+        acc[node] = [key];
+      }
+      return acc;
+    }, {});
+    const nodes = _.keys(mapping);
+    async.map(nodes, (node, next) => {
+      const keys = mapping[node];
+      const client = clients[node];
+      client.mset(keys, next);
+    }, (err, responses) => {
+      if (err) {
+        return callback(err);
+      }
+      return callback(null, 'OK');
+    });
+  };
+
   // No key parameter to shard on - throw Error
   const UNSHARDABLE = [
     'auth', 'bgrewriteaof', 'bgsave', 'bitop', 'brpoplpush', 'client kill', 'client list', 'client getname',
     'client setname', 'config get', 'config set', 'config resetstat', 'dbsize', 'debug segfault', 'discard',
     'echo', 'eval', 'evalsha', 'exec', 'flushall', 'flushdb', 'info', 'keys', 'lastsave', 'migrate', 'monitor',
-    'mset', 'msetnx', 'multi', 'object', 'ping', 'psubscribe', 'publish', 'punsubscribe', 'quit', 'randomkey',
+    'msetnx', 'multi', 'object', 'ping', 'psubscribe', 'publish', 'punsubscribe', 'quit', 'randomkey',
     'rpoplpush', 'save', 'script exists', 'script flush', 'script kill', 'script load', 'sdiffstore', 'select',
     'shutdown', 'sinterstore', 'slaveof', 'slowlog', 'smove', 'subscribe', 'sunionstore', 'sync', 'time',
     'unsubscribe', 'unwatch', 'zinterstore', 'zunionstore'
