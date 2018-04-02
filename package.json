@@ -1,10 +1,10 @@
 {
-  "name": "redis-shard",
-  "version": "0.3.0",
+  "name": "redis-shard-optimized",
+  "version": "0.3.1",
   "description": "A consistent hashing library for redis in node",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node test.js"
   },
   "dependencies": {
     "async": "^1.5.2",
@@ -19,10 +19,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/blindsey/node-redis-shard.git"
+    "url": "git://github.com/ppsreejith/node-redis-shard.git"
   },
   "author": "Ben Lindsey <ben.lindsey@gmail.com>",
   "contributors": [
+    "Sreejith Pp <mailz4sreejith@gmail.com>",
     "Toby Fox <tobyfox@gmail.com>"
   ],
   "license": "MIT",
