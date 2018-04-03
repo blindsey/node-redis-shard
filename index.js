@@ -67,7 +67,7 @@ module.exports = function RedisShard(options) {
     async.map(nodes, (node, next) => {
       const keys = mapping[node];
       const client = clients[node];
-      console.log(node, keys.length);
+      //      console.log(node, keys.length);
       client.mget(keys, next);
     }, (err, results) => {
       if (err) {
