@@ -4,7 +4,7 @@
   "description": "A consistent hashing library for redis in node",
   "main": "index.js",
   "scripts": {
-    "test": "node test.js"
+    "tests": "node test.js"
   },
   "dependencies": {
     "async": "^1.5.2",

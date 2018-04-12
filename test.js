@@ -29,7 +29,16 @@ async.times(NUM, (index, next) => {
     mset: callback => redis.mset(msetArgs, callback),
     mget: ['mset', callback => redis.mget(keys, callback)]
   }, (err, { mset, mget }) => {
-    console.log('error is', err, mset);
+    if (err) {
+      throw err;
+    } else if (mset !== 'OK') {
+      throw 'mset was not successful';
+    } else if (!_.isEqual(mget, values)) {
+      throw 'Mget response doesn\'t match values';
+    } else {
+      console.log('Success. All tests passed.');
+      process.exit(0);
+    }
   });
 });
 
