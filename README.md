@@ -1,5 +1,5 @@
-redis-shard
-===========
+redis-shard-optimized
+=====================
 
 A consistent sharding library for redis in node.
 
