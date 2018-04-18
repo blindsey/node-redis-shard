@@ -32,7 +32,7 @@ module.exports = function RedisShard(options) {
 
   // All of these commands have 'key' as their first parameter
   const SHARDABLE = [
-    'append', 'bitcount', 'blpop', 'brpop', 'debug object', 'decr', 'decrby', 'del', 'dump', 'exists', 'expire',
+    'keys', 'append', 'bitcount', 'blpop', 'brpop', 'debug object', 'decr', 'decrby', 'del', 'dump', 'exists', 'expire',
     'expireat', 'get', 'getbit', 'getrange', 'getset', 'hdel', 'hexists', 'hget', 'hgetall', 'hincrby',
     'hincrbyfloat', 'hkeys', 'hlen', 'hmget', 'hmset', 'hset', 'hsetnx', 'hvals', 'incr', 'incrby', 'incrbyfloat',
     'lindex', 'linsert', 'llen', 'lpop', 'lpush', 'lpushx', 'lrange', 'lrem', 'lset', 'ltrim', 'move',
@@ -82,6 +82,24 @@ module.exports = function RedisShard(options) {
     });
   };
 
+  // keys
+  self.keys = function () {
+    const key_regex = _.first(arguments);
+    const callback = _.last(arguments);
+    const nodes = _.keys(self.ring.vnodes);
+    async.map(nodes, (node, next) => {
+      const client = clients[node];
+      client.keys(key_regex, next);
+    }, (err, results) => {
+      if (err) {
+        return callback(err);
+      }
+      let keys = [];
+      _.map(results, node_keys => keys = _.concat(keys, node_keys));
+      return callback(err, keys);
+    });
+  };
+
   // mset
   self.mset = function () {
     const keys = _.first(arguments);
@@ -113,7 +131,7 @@ module.exports = function RedisShard(options) {
   const UNSHARDABLE = [
     'auth', 'bgrewriteaof', 'bgsave', 'bitop', 'brpoplpush', 'client kill', 'client list', 'client getname',
     'client setname', 'config get', 'config set', 'config resetstat', 'dbsize', 'debug segfault', 'discard',
-    'echo', 'eval', 'evalsha', 'exec', 'flushall', 'flushdb', 'info', 'keys', 'lastsave', 'migrate', 'monitor',
+    'echo', 'eval', 'evalsha', 'exec', 'flushall', 'flushdb', 'info', 'lastsave', 'migrate', 'monitor',
     'msetnx', 'multi', 'object', 'ping', 'psubscribe', 'publish', 'punsubscribe', 'quit', 'randomkey',
     'rpoplpush', 'save', 'script exists', 'script flush', 'script kill', 'script load', 'sdiffstore', 'select',
     'shutdown', 'sinterstore', 'slaveof', 'slowlog', 'smove', 'subscribe', 'sunionstore', 'sync', 'time',
