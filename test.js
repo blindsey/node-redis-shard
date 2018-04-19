@@ -6,8 +6,9 @@ const RedisShard = require('./index');
 
 const PORT = 7000;
 const NUM = 5;
+const TESTS = {};
 
-const keysCommandTests = ({KEY_NUM, redis}, callback) => {
+TESTS.keysCommandTests = ({KEY_NUM, redis}, callback) => {
   const keys = _.times(KEY_NUM, n => `fooregexx${n}`);
   const values = _.times(KEY_NUM, n => `barregexx${n}`);
 
@@ -51,7 +52,7 @@ const keysCommandTests = ({KEY_NUM, redis}, callback) => {
   });
 };
 
-const multiSetGetCommandTests = ({KEY_NUM, redis}, callback) => {
+TESTS.multiSetGetCommandTests = ({KEY_NUM, redis}, callback) => {
   const keys = _.times(KEY_NUM, n => `foo${n}`);
   const values = _.times(KEY_NUM, n => `bar${n}`);
 
@@ -86,16 +87,12 @@ async.times(NUM, (index, next) => {
     servers: _.map(_.times(NUM, n => `127.0.0.1:${PORT + n}`))
   };
   const redis = new RedisShard(options);
-  const KEY_NUM = 100000;
+  const KEY_NUM = 1000;
 
   const args = { KEY_NUM, redis };
 
-  const tests = {
-    keysCommandTests, multiSetGetCommandTests
-  };
-
   const asyncArgs = _.reduce(
-    tests,
+    TESTS,
     (acc, value, key) => {
       acc[key] = _.partial(value, args);
       return acc;
