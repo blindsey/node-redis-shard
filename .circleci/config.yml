@@ -27,6 +27,10 @@ jobs:
           - v1-dependencies-
 
       - run: npm install
+      
+      - run: sudo apt-get update
+      
+      - run: sudo apt-get install redis-server
 
       - save_cache:
           paths:
