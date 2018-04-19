@@ -1,6 +1,8 @@
 redis-shard-optimized
 =====================
 
+[![CircleCI](https://circleci.com/gh/ppsreejith/node-redis-shard.svg?style=svg)](https://circleci.com/gh/ppsreejith/node-redis-shard)
+
 A consistent sharding library for redis in node.
 
 This project improves over the parent project by consistently distributing mget and mset over the sharded redis instances. (The parent implementation sends mget and mset to a single instance).
