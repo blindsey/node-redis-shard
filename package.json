@@ -1,14 +1,17 @@
 {
-  "name": "redis-shard",
-  "version": "0.3.0",
+  "name": "redis-shard-optimized",
+  "version": "0.3.4",
   "description": "A consistent hashing library for redis in node",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "tests": "node test.js"
   },
   "dependencies": {
+    "async": "^1.5.2",
     "hashring": "^3.2.0",
+    "lodash": "^4.17.5",
     "redis": "^2.1.0",
+    "redis-server": "^1.2.0",
     "step": "0.0.6"
   },
   "engines": {
@@ -16,12 +19,21 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/blindsey/node-redis-shard.git"
+    "url": "git://github.com/ppsreejith/node-redis-shard.git"
   },
   "author": "Ben Lindsey <ben.lindsey@gmail.com>",
   "contributors": [
+    "Sreejith Pp <mailz4sreejith@gmail.com>",
     "Toby Fox <tobyfox@gmail.com>"
   ],
   "license": "MIT",
-  "readmeFilename": "README.md"
+  "readmeFilename": "README.md",
+  "devDependencies": {
+    "babel-eslint": "^8.2.1",
+    "eslint": "^4.18.0",
+    "eslint-config-airbnb": "^16.1.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-jsx-a11y": "^6.0.3",
+    "eslint-plugin-react": "^7.7.0"
+  }
 }
